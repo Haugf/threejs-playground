@@ -1,65 +1,68 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="utf-8">
-		<title>My first three.js app</title>
-		<style>
-			body { margin: 0; }
-			canvas { display: block; }
-			#info {
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-				color: white;
-			}
-		</style>
-	</head>
-	<body>
-		<script src="js/three.js"></script>
-		<script>
-		    	var scene = new THREE.Scene();
-			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+html>
+<head>
+  <style>
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    background: #000;
+  }
+  body {
+    margin: 0;
+    overflow: hidden;
+  }
+  canvas {
+    width: 100%;
+    height: 100%;
+  }
+  </style>
+  <meta charset='UTF-8'>
+</head>
+<body>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/97/three.min.js'></script>
+  <script src='https://threejs.org/examples/jsm/controls/OrbitControls.js'></script>
 
-	
-			var renderer = new THREE.WebGLRenderer();
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			document.body.appendChild( renderer.domElement );
+  <script>
 
-			var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-			var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-			var cube = new THREE.Mesh( geometry, material );
-			scene.add( cube );
+  var container = document.querySelector('body'),
+      w = container.clientWidth,
+      h = container.clientHeight,
+      scene = new THREE.Scene(),
+      camera = new THREE.PerspectiveCamera(75, w/h, 0.001, 100),
+	//   controls = new THREE.TrackballControls(camera, container),
+      renderConfig = {antialias: true, alpha: true},
+	  renderer = new THREE.WebGLRenderer(renderConfig);
+	  controls = new THREE.OrbitControls(camera, renderer)
 
-			camera.position.z = 5;
+  controls.target = new THREE.Vector3(0, 0, 0.75);
+  controls.panSpeed = 0.4;
+  camera.position.set(0, 0, -10);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(w, h);
+  container.appendChild(renderer.domElement);
 
-			//create a blue LineBasicMaterial
-			const lineMaterial = new THREE.LineDashedMaterial( { color: 0x0000ff } );
-			
-			const points = [];
-			points.push( new THREE.Vector3( - 10, 0, 0 ) );
-			points.push( new THREE.Vector3( 0, 1, 0 ) );
-			points.push( new THREE.Vector3( 10, 0, 0 ) );
+  window.addEventListener('resize', function() {
+    w = container.clientWidth;
+    h = container.clientHeight;
+    camera.aspect = w/h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  })
 
+  function render() {
+    requestAnimationFrame(render);
+    renderer.render(scene, camera);
+    controls.update();
+  }
 
-			const lineGeometry = new THREE.BufferGeometry().setFromPoints( points );
-			const line = new THREE.Line( lineGeometry, lineMaterial );
-			scene.add( line );
-			
+  // draw some geometries
+  var geometry = new THREE.TorusGeometry( 10, 3, 16, 100, );
+  var material = new THREE.MeshNormalMaterial( { color: 0xffff00, } );
+  var torus = new THREE.Mesh( geometry, material, );
+  scene.add( torus );
 
-			var animate = function () {
-				requestAnimationFrame( animate );
+  render();
 
-				cube.rotation.x += 0.01;
-				cube.rotation.y += 0.01;
-
-				renderer.render( scene, camera );
-			};
-
-			animate();
-		</script>
-		<div id="info">Description</div>
-	</body>
+  </script>
+</body>
 </html>

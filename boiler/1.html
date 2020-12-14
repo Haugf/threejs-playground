@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - geometry - extrude shapes</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #222;
+			}
+			a {
+				color: #f80;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<script type="module">
+
+			import * as THREE from './three.js/build/three.module.js';
+
+			import { TrackballControls } from './three.js/examples/jsm/controls/TrackballControls.js';
+
+            let camera, scene, renderer, controls;
+            
+            var mercury, earth, angle = 0;;
+
+            init();
+
+
+            initSun();
+
+            mercury = initMercury();
+            scene.add( mercury )
+
+
+
+			animate();
+
+			function init() {
+
+				const info = document.createElement( 'div' );
+				info.style.position = 'absolute';
+				info.style.top = '10px';
+				info.style.width = '100%';
+				info.style.textAlign = 'center';
+				info.style.color = '#fff';
+				info.style.link = '#f80';
+				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - geometry extrude shapes';
+				document.body.appendChild( info );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 0, 500 );
+
+				controls = new TrackballControls( camera, renderer.domElement );
+				controls.minDistance = 200;
+                controls.maxDistance = 500;
+            
+
+				scene.add( new THREE.AmbientLight( 0x222222 ) );
+
+				const light = new THREE.PointLight( 0xffffff );
+				light.position.copy( camera.position );
+				scene.add( light );
+
+
+			}
+
+			function animate() {
+
+                requestAnimationFrame( animate );
+                
+
+                // Check the object's X position
+                if (mercury.position.z < 1000) {
+                    // mercury.position.x += -1; // You decide on the increment, higher value will mean the objects moves faster
+                    // mercury.position.y += -1; 
+                    mercury.position.z += 10; 
+                }
+
+                    // Check the object's X position
+                    if (mercury.position.z >= 100) {
+                    // mercury.position.x += -1; // You decide on the increment, higher value will mean the objects moves faster
+                    // mercury.position.y += -1; 
+                    mercury.position.z -= 10; 
+                }
+
+				controls.update();
+				renderer.render( scene, camera );
+
+            }
+
+            
+            // Shape 2 : The Wiggle
+            function initTube() {
+
+                const randomPoints = [];
+
+                for ( let i = 0; i < 10; i ++ ) {
+
+                    randomPoints.push( new THREE.Vector3( ( i - 4.5 ) * 50, THREE.MathUtils.randFloat( - 50, 50 ), THREE.MathUtils.randFloat( - 50, 50 ) ) );
+
+                }
+
+                const randomSpline = new THREE.CatmullRomCurve3( randomPoints );
+
+                const extrudeSettings2 = {
+                    steps: 16000,
+                    bevelEnabled: false,
+                    extrudePath: randomSpline
+                };
+
+                const pts2 = [], numPts = 7;
+
+                for ( let i = 0; i < numPts * 2; i ++ ) {
+
+                    const l = i % 2 == 1 ? 10 : 15;
+
+                    const a = i / numPts * Math.PI;
+
+                    pts2.push( new THREE.Vector2( Math.cos( THREE.MathUtils.randFloat( - 50, 50 ) ) * l, Math.sin( THREE.MathUtils.randFloat( - 50, 50 ) ) * l ) );
+
+                }
+
+                const shape2 = new THREE.Shape( pts2 );
+
+                const geometry2 = new THREE.ExtrudeBufferGeometry( shape2, extrudeSettings2 );
+
+                const material2 = new THREE.MeshLambertMaterial( { color: 0xff8000, wireframe: false } );
+
+                const mesh2 = new THREE.Mesh( geometry2, material2 );
+
+                return mesh2;
+            }
+
+            function initShape() {
+                const closedSpline = new THREE.CatmullRomCurve3( [
+					new THREE.Vector3( - 60, - 100, 60 ),
+					new THREE.Vector3( - 60, 20, 60 ),
+					new THREE.Vector3( - 60, 120, 60 ),
+					new THREE.Vector3( 60, 20, - 60 ),
+					new THREE.Vector3( 60, - 100, - 60 )
+				] );
+
+				closedSpline.curveType = 'catmullrom';
+				closedSpline.closed = true;
+
+				const extrudeSettings1 = {
+					steps: 100,
+					bevelEnabled: false,
+					extrudePath: closedSpline
+				};
+
+
+				const pts1 = [], count = 3;
+
+				for ( let i = 0; i < count; i ++ ) {
+
+					const l = 20;
+
+					const a = 2 * i / count * Math.PI;
+
+					pts1.push( new THREE.Vector2( Math.cos( a ) * l, Math.sin( a ) * l ) );
+
+				}
+
+				const shape1 = new THREE.Shape( pts1 );
+
+				const geometry1 = new THREE.ExtrudeBufferGeometry( shape1, extrudeSettings1 );
+
+				const material1 = new THREE.MeshLambertMaterial( { color: 0xb00000, wireframe: false } );
+
+				const mesh1 = new THREE.Mesh( geometry1, material1 );
+
+				return mesh1;
+            }
+
+            function initSun(){
+                const geometry = new THREE.SphereGeometry( 50, 32, 32 );
+                const material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+                const sphere = new THREE.Mesh( geometry, material );
+                scene.add( sphere );
+            }
+
+            function initMercury(){
+                const geometry = new THREE.SphereGeometry( 5, 32, 32 );
+                const material = new THREE.MeshBasicMaterial( {color: 0xe86100} );
+                const sphere = new THREE.Mesh( geometry, material );
+                sphere.position.set(100, 70)
+                return sphere;
+            }
+
+            function initEarth(){
+                const geometry = new THREE.SphereGeometry( 15, 32, 32 );
+                const material = new THREE.MeshBasicMaterial( {color: 0xe86100} );
+                const sphere = new THREE.Mesh( geometry, material );
+                sphere.position.set(120,  80)
+                return sphere;
+            }
+
+		</script>
+
+	</body>
+
+</html>
