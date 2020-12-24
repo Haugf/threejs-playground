@@ -35,7 +35,7 @@
             mercury = initMercury();
             scene.add( mercury )
 
-
+			scene.add(initEarth());
 
 			animate();
 
@@ -202,7 +202,7 @@
 
             function initEarth(){
                 const geometry = new THREE.SphereGeometry( 15, 32, 32 );
-                const material = new THREE.MeshBasicMaterial( {color: 0xe86100} );
+                const material = new THREE.MeshBasicMaterial( {color: 0x0dba86 } );
                 const sphere = new THREE.Mesh( geometry, material );
                 sphere.position.set(120,  80)
                 return sphere;
